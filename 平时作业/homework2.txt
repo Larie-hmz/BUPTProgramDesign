@@ -1,0 +1,7 @@
+bug现象说明：
+1、每次打印next的时候都会多打印一位
+2、在linux系统下会报segment fault，查阅资料发现是段错误，存在内存泄漏的问题
+
+查找bug1过程，发现next多打印了一位，就找到打印next数组的地方，发现打印的时候pattern与next打印的边界条件都是i<=length，都多打了一个数，因此bug1的修改如下，只要修改for循环即可：for(int i = 0; i < length; i++)
+
+查找bug2的过程，我们发现next打印出了问题，观察build_next的函数，我们发现，在函数中申请了内存，并最后返回了指向该内存地址的指针。而该内存在函数执行完之后理应是被释放的，但是返回指针之后我们会一直调用这个地址处的值，导致发生了错误。为了解决这个问题，我们在函数外面申请next数组，并将next数组指针以参数的方式传递进去，将build_next接口改成如下：void build_next(const char* pattern, int length,int* next)
